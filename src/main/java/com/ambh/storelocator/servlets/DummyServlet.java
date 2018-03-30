@@ -1,4 +1,4 @@
-package com.ambh.storelocator.servlets;
+package main.java.com.ambh.storelocator.servlets;
 
 import java.io.IOException;
 import javax.servlet.ServletException;

@@ -1,0 +1,70 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ambh.storelocator</groupId>
+	<artifactId>store-locator</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>Store Locator</name>
+	<description>Google Maps certification task.</description>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+
+		<appengine.maven.plugin>1.3.2</appengine.maven.plugin>
+		<jetty.maven.plugin>9.4.3.v20170317</jetty.maven.plugin>
+	</properties>
+
+	<dependencies>
+		<dependency>                        <!-- REQUIRED -->
+			<groupId>javax.servlet</groupId>  <!-- Java Servlet API -->
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>           <!-- Provided by the Jetty Servlet Container -->
+		</dependency>
+	</dependencies>
+
+	<build>
+		<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<warSourceDirectory>WebContent</warSourceDirectory>
+				</configuration>
+			</plugin>
+
+			<plugin>                          <!-- Used for local debugging -->
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>${jetty.maven.plugin}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>appengine-maven-plugin</artifactId>
+				<version>${appengine.maven.plugin}</version>
+				<configuration>
+					<!-- deploy configuration -->
+					<!-- 
+					<deploy.promote>true</deploy.promote> <!~~ DEFAULT value ~~>
+					<deploy.stopPreviousVersion>true</deploy.stopPreviousVersion> <!~~ DEFAULT value ~~> 
+					-->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
