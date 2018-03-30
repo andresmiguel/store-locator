@@ -5,7 +5,7 @@ function init() {
 }
 
 function displayStores(map) {
-    AJAX.getJSON("js/stores.json", function(response, status) {
+    AJAX.getJSON("api/rest/stores", function(response, status) {
         if (status === 200) {
             STORES.init(response);
             STORES.displayOnMap(map);
