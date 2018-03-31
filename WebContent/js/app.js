@@ -59,12 +59,7 @@ var STORES = (function() {
                     storeArr[i].lat,
                     storeArr[i].lng
                 );
-                _markers[storeArr[i].id] = new google.maps.Marker({
-                    position: new google.maps.LatLng(storeArr[i].lat, storeArr[i].lng),
-                    map: null,
-                    title: storeArr[i].name,
-                    animation: google.maps.Animation.DROP
-                });
+                _markers[storeArr[i].id] = _createMarker(storeArr[i]);
             }
         }
     };
@@ -116,6 +111,28 @@ var STORES = (function() {
         for (var i = 0; i < keys.length; i++) {
             _markers[keys[i]].setMap(null);
         }
+    }
+
+    var _createMarker = function(store) {
+        var newMarker = new google.maps.Marker({
+           position: new google.maps.LatLng(store.lat, store.lng),
+           map: null,
+           title: store.name,
+           animation: google.maps.Animation.DROP
+        });
+
+        newMarker.addListener('click', function() {
+            var infowindow = _createStoreStoreMarkerWindow(store);
+            infowindow.open(_map, newMarker);
+        });
+
+        return newMarker;
+    }
+
+    _createStoreStoreMarkerWindow = function(store) {
+        return new google.maps.InfoWindow({
+          content: "<b>" + store.name + "</b><br>" + store.address
+        });
     }
 
     var _assertMap = function() {
