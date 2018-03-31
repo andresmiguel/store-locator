@@ -1,6 +1,10 @@
 
 function init() {
-    STORES.setMap(createMap());
+    STORES.config({
+        "map": createMap(),
+        "store-select": document.getElementById("stores-sel"),
+        "search-input": document.getElementById("search-location")
+    });
     displayStores();
 }
 
@@ -8,8 +12,7 @@ function displayStores() {
     AJAX.getJSON("api/rest/stores", {}, function(response, status) {
         if (status === 200) {
             STORES.load(response);
-            STORES.displayAllOnMap();
-            STORES.displayOnSelect(document.getElementById("stores-sel"));
+            STORES.display();
         }
     });
 }
@@ -43,6 +46,9 @@ var STORES = (function() {
     var _map = null;
     var SEE_ALL_STORES = -1;
     var _GEOCODER = new google.maps.Geocoder();
+    var _storeSelect;
+    var _searchInput;
+    var _autoComplete;
 
     var Store = function(id, name, address, lat, lng) {
         this.id = id;
@@ -52,9 +58,12 @@ var STORES = (function() {
         this.lng = lng;
     };
 
-    var setMap = function(map) {
-        _map = map;
-    };
+    var config = function(configObj) {
+        _map = configObj["map"];
+        _storeSelect = configObj["store-select"];
+        _searchInput = configObj["search-input"];
+        _createAutocomplete(_map, _searchInput);
+    }
 
     var load = function(storeArr) {
         _stores = {};
@@ -78,19 +87,24 @@ var STORES = (function() {
         load(storeArr);
     };
 
+    var display = function() {
+        _displayAllOnMap();
+        _displayOnSelect();
+    }
+
     var displayOnMap = function(storeId) {        
         
         _assertMap();
 
         if (storeId && storeId == SEE_ALL_STORES) {
-            displayAllOnMap();
+            _displayAllOnMap();
         } else if (storeId) {
             hideAllMarkers();
             _markers[storeId] && _markers[storeId].setMap(_map);
         }
     };
 
-    var displayAllOnMap = function() {
+    var _displayAllOnMap = function() {
 
         _assertMap();
 
@@ -105,13 +119,13 @@ var STORES = (function() {
         _map.fitBounds(bounds); 
     };
 
-    var displayOnSelect = function(select) {
-        if (select) {
+    var _displayOnSelect = function() {
+        if (_storeSelect) {
             var keys = Object.keys(_stores);
-            _clearSelect(select);
-            select.options[select.options.length] = new Option("See all stores", SEE_ALL_STORES);
+            _clearSelect(_storeSelect);
+            _storeSelect.options[_storeSelect.options.length] = new Option("See all stores", SEE_ALL_STORES);
             for (var i = 0; i < keys.length; i++) {
-                select.options[select.options.length] = new Option(_stores[keys[i]].name, _stores[keys[i]].id);
+                _storeSelect.options[_storeSelect.options.length] = new Option(_stores[keys[i]].name, _stores[keys[i]].id);
             }
         }
     };
@@ -125,25 +139,39 @@ var STORES = (function() {
     };
 
     var displayInRadius = function(radius, address) {
-        _GEOCODER.geocode({"address": address}, function(results, status) {
-            if (status == google.maps.GeocoderStatus.OK) {
-                var lat = results[0].geometry.location.lat();
-                var lng = results[0].geometry.location.lng();
-                var params = {
-                    "radius": radius,
-                    "lat": Number.parseFloat(lat),
-                    "lng": Number.parseFloat(lng)
-                };
-                AJAX.getJSON("api/rest/stores/search/radius", params, function(response, status) {
-                    if (status === 200) {
-                        reset(response);
-                        displayAllOnMap();
-                        displayOnSelect(document.getElementById("stores-sel"));
-                    }
-                });
+        var place = _autoComplete.getPlace();
+        if (place) {
+            _doRadiusRequest(
+                radius,
+                place.geometry.location.lat(),
+                place.geometry.location.lng()
+            );
+        } else {
+            _GEOCODER.geocode({"address": address}, function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    _doRadiusRequest(
+                        radius,
+                        results[0].geometry.location.lat(),
+                        results[0].geometry.location.lng()
+                    );
+                }
+            });
+        }
+    };
+
+    var _doRadiusRequest = function(radius, lat, lng) {
+        var params = {
+            "radius": radius,
+            "lat": Number.parseFloat(lat),
+            "lng": Number.parseFloat(lng)
+        };
+        AJAX.getJSON("api/rest/stores/search/radius", params, function(response, status) {
+            if (status === 200) {
+                reset(response);
+                display();
             }
         });
-    };
+    }
 
     var _createMarker = function(store) {
         var newMarker = new google.maps.Marker({
@@ -174,17 +202,21 @@ var STORES = (function() {
     };
 
     _clearSelect = function(select) {
-        for(var i = select.options.length - 1 ; i >= 0 ; i--) {
+        for(var i = select.options.length - 1; i >= 0; i--) {
             select.remove(i);
         }
-    }
+    };
+
+    _createAutocomplete = function(map, autoCompleteElem) {
+        _autoComplete = new google.maps.places.Autocomplete(autoCompleteElem);
+        _autoComplete.bindTo('bounds', map);
+    };
 
     return {
         Store: Store,
-        setMap: setMap,
+        config: config,
         load: load,
-        displayAllOnMap: displayAllOnMap,
-        displayOnSelect: displayOnSelect,
+        display: display,
         displayOnMap: displayOnMap,
         displayInRadius: displayInRadius,
         reset: reset      
