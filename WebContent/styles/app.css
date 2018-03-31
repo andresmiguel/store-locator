@@ -1,0 +1,135 @@
+* {
+  box-sizing: border-box; 
+}
+
+html {
+  font-family: "Verdana Sans", sans-serif !important; 
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: block; }
+
+[class*="col-"] {
+  width: 100%;
+  float: left; }
+
+@media only screen and (min-width: 768px) {
+  .col-1 {
+    width: 8.33333%; 
+  }
+  .col-2 {
+    width: 16.66667%; 
+  }
+  .col-3 {
+    width: 25%; 
+  }
+  .col-4 {
+    width: 33.33333%; 
+  }
+  .col-5 {
+    width: 41.66667%; 
+  }
+  .col-6 {
+    width: 50%; 
+  }
+  .col-7 {
+    width: 58.33333%; 
+  }
+  .col-8 {
+    width: 66.66667%; 
+  }
+  .col-9 {
+    width: 75%; 
+  }
+  .col-10 {
+    width: 83.33333%; 
+  }
+  .col-11 {
+    width: 91.66667%; 
+  }
+  .col-12 {
+    width: 100%; 
+  }
+  div.form-group {
+    margin-bottom: 1.3em; 
+  }
+}
+
+div#stores-form {
+  margin-right: 10px;
+}
+
+div.form-group {
+  margin-bottom: 0.7em; 
+}
+
+input, select, textarea {
+  border: 1px solid gray;
+  height: 30px;  
+  padding: 8px 6px;
+  line-height: 1.42857143;
+}
+
+.right {
+  text-align: right; 
+}
+
+.left {
+  text-align: left; 
+}
+
+.center {
+  text-align: center; 
+}
+
+.has-error {
+    color: red; 
+}
+
+#map {
+	height: 500px;
+}
+
+input#radius {
+  width: 40%;
+}
+
+#kms {
+  font-size: small;
+}
+
+button {
+  font-family: "Roboto medium", sans-serif;
+  font-size: 14px;
+  display: inline-block;
+  height: 36px;
+  min-width: 88px;
+  padding: 6px 16px;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 0;
+  border-radius: 2px;
+  background: #ffffff;
+  color: #1a1a1a;
+  outline: 0;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 
+              0 1px 5px 0 rgba(0, 0, 0, 0.12), 
+              0 3px 1px -2px rgba(0, 0, 0, 0.2);  
+}
+
+button:active {
+  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12),
+              0 5px 5px -3px rgba(0, 0, 0, 0.4);
+}

@@ -5,14 +5,39 @@
 	<title>Store Locator</title>
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyDHrH9RHeSp5ItHdq3T59dRYR7meTMrp_k"></script>
 	<script type="text/javascript" src="js/app.js"></script>
-	<style>
-		#map {
-			height: 500px;
-			width: 768px;
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="styles/app.css">
 </head>
 <body>
-	<div id="map"></div>
+	<div>
+		<div class="row">
+			<div class="col-12">
+				<h2 class="center">Welcome to Store Locator!</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-3">
+				<div id="stores-form">
+					<div class="row form-group">
+						<label for="stores" class="col-12">Stores</label>
+						<select name="stores" id="stores" class="col-12"></select>
+					</div>
+					<div class="row form-group">
+						<label for="search-location" class="col-12">Search Location</label>
+						<input type="text" id="search-location" class="col-12" />
+					</div>
+					<div class="row form-group">
+						<label for="radius" class="col-12">Radius</label>
+						<div class="col-12"><input type="number" min="0" max="99999" id="radius" /><span id="kms">&nbsp;kms</span></div>
+					</div>
+					<div class="row form-group center">
+						<button onclick="">SEARCH</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-9">
+				<div id="map"></div>
+			</div>
+		</div>
+	</div>	
 </body>
 </html>
