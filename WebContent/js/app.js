@@ -1,14 +1,14 @@
 
 function init() {
-    var map = createMap();
-    displayStores(map);
+    STORES.setMap(createMap());
+    displayStores();
 }
 
-function displayStores(map) {
+function displayStores() {
     AJAX.getJSON("api/rest/stores", function(response, status) {
         if (status === 200) {
             STORES.load(response);
-            STORES.displayOnMap(map);
+            STORES.displayAllOnMap();
             STORES.displayOnSelect(document.getElementById("stores-sel"));
         }
     });
@@ -24,10 +24,17 @@ function createMap() {
 
 google.maps.event.addDomListener(window, "load", init);
 
+function onSelectStore() {
+    var selElem = document.getElementById("stores-sel");
+    var selectedStoreId = selElem.options[selElem.selectedIndex].value;
+    STORES.displayOnMap(selectedStoreId);
+}
+
 var STORES = (function() {
 
     var _stores = {};
     var _markers = {};
+    var _map = null;
     var SEE_ALL_STORES = -1;
 
     var Store = function(id, name, address, lat, lng) {
@@ -37,6 +44,10 @@ var STORES = (function() {
         this.lat = lat;
         this.lng = lng;
     };
+
+    var setMap = function(map) {
+        _map = map;
+    }
 
     var load = function(storeArr) {
         if (storeArr) {
@@ -58,16 +69,31 @@ var STORES = (function() {
         }
     };
 
-    var displayOnMap = function(map) {
+    var displayOnMap = function(storeId) {        
+        
+        _assertMap();
+
+        if (storeId && storeId == SEE_ALL_STORES) {
+            displayAllOnMap();
+        } else if (storeId) {
+            hideAllMarkers();
+            _markers[storeId] && _markers[storeId].setMap(_map);
+        }
+    }
+
+    var displayAllOnMap = function() {
+
+        _assertMap();
+
         var keys = Object.keys(_markers);
         var bounds = new google.maps.LatLngBounds();
 
         for (var i = 0; i < keys.length; i++) {
             var marker = _markers[keys[i]];
             bounds.extend(marker.position);
-            marker.setMap(map);
+            marker.setMap(_map);
         }
-        map.fitBounds(bounds); 
+        _map.fitBounds(bounds); 
     }
 
     var displayOnSelect = function(select) {
@@ -84,11 +110,27 @@ var STORES = (function() {
         return _stores[id];
     }
 
+    var hideAllMarkers = function() {
+        var keys = Object.keys(_markers);
+
+        for (var i = 0; i < keys.length; i++) {
+            _markers[keys[i]].setMap(null);
+        }
+    }
+
+    var _assertMap = function() {
+        if (_map === null) {
+            throw "Map is not set!";
+        }
+    }
+
     return {
         Store: Store,
+        setMap: setMap,
         load: load,
-        displayOnMap: displayOnMap,
-        displayOnSelect: displayOnSelect
+        displayAllOnMap: displayAllOnMap,
+        displayOnSelect: displayOnSelect,
+        displayOnMap: displayOnMap        
     };
 })();
 
