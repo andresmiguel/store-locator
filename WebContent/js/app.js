@@ -43,6 +43,8 @@ var STORES = (function() {
 
     var _stores = {};
     var _markers = {};
+    var _userMarker;
+    var _userMarkerIcon;
     var _map = null;
     var SEE_ALL_STORES = -1;
     var _GEOCODER = new google.maps.Geocoder();
@@ -63,6 +65,7 @@ var STORES = (function() {
         _storeSelect = configObj["store-select"];
         _searchInput = configObj["search-input"];
         _createAutocomplete(_map, _searchInput);
+        _createUserMarkerIcon();
     }
 
     var load = function(storeArr) {
@@ -169,6 +172,7 @@ var STORES = (function() {
             if (status === 200) {
                 reset(response);
                 display();
+                _displayUserMaker(lat, lng);
             }
         });
     }
@@ -201,16 +205,38 @@ var STORES = (function() {
         }
     };
 
-    _clearSelect = function(select) {
+    var _clearSelect = function(select) {
         for(var i = select.options.length - 1; i >= 0; i--) {
             select.remove(i);
         }
     };
 
-    _createAutocomplete = function(map, autoCompleteElem) {
+    var _createAutocomplete = function(map, autoCompleteElem) {
         _autoComplete = new google.maps.places.Autocomplete(autoCompleteElem);
         _autoComplete.bindTo('bounds', map);
     };
+
+    var _createUserMarkerIcon = function() {
+        var userPinColor = "009688";
+        _userMarkerIcon = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + userPinColor,
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34));
+    }
+
+    var _displayUserMaker = function(lat, lng) {
+        _assertMap();
+
+        if (!_userMarker) {
+            _userMarker = new google.maps.Marker({
+                title: "User Location",
+                animation: google.maps.Animation.DROP,
+                icon: _userMarkerIcon,
+                map: _map
+            });
+        }
+        _userMarker.setPosition(new google.maps.LatLng(lat, lng));
+    }
 
     return {
         Store: Store,
