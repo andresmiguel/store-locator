@@ -7,8 +7,9 @@ function init() {
 function displayStores(map) {
     AJAX.getJSON("api/rest/stores", function(response, status) {
         if (status === 200) {
-            STORES.init(response);
+            STORES.load(response);
             STORES.displayOnMap(map);
+            STORES.displayOnSelect(document.getElementById("stores-sel"));
         }
     });
 }
@@ -27,6 +28,7 @@ var STORES = (function() {
 
     var _stores = {};
     var _markers = {};
+    var SEE_ALL_STORES = -1;
 
     var Store = function(id, name, address, lat, lng) {
         this.id = id;
@@ -36,7 +38,7 @@ var STORES = (function() {
         this.lng = lng;
     };
 
-    var init = function(storeArr) {
+    var load = function(storeArr) {
         if (storeArr) {
             for(var i = 0; i < storeArr.length; i++) {
                 _stores[storeArr[i].id] = new Store(
@@ -68,10 +70,25 @@ var STORES = (function() {
         map.fitBounds(bounds); 
     }
 
+    var displayOnSelect = function(select) {
+        if (select) {
+            var keys = Object.keys(_stores);
+            select.options[select.options.length] = new Option("See all stores", SEE_ALL_STORES);
+            for (var i = 0; i < keys.length; i++) {
+                select.options[select.options.length] = new Option(_stores[keys[i]].name, _stores[keys[i]].id);
+            }
+        }
+    }
+
+    var getById = function(id) {
+        return _stores[id];
+    }
+
     return {
         Store: Store,
-        init: init,
-        displayOnMap: displayOnMap
+        load: load,
+        displayOnMap: displayOnMap,
+        displayOnSelect: displayOnSelect
     };
 })();
 

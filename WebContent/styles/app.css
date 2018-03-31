@@ -67,9 +67,10 @@ div.form-group {
 
 input, select, textarea {
   border: 1px solid gray;
-  height: 30px;  
-  padding: 8px 6px;
-  line-height: 1.42857143;
+  height: 34px;  
+  padding: 5px 6px;
+  line-height: 1.32857143;
+  background-color: white;
 }
 
 .right {
