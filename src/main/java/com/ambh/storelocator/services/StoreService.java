@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.ambh.storelocator.domain.Store;
 import com.google.gson.Gson;
@@ -46,7 +47,46 @@ public class StoreService {
 		}
 	}
 
+	/**
+	 * Returns all stores
+	 */
 	public Set<Store> getAllStores() {
 		return stores;
 	}
+	
+	/**
+	 * Returns all stores within {@code radius} with center in {@code lat} and {@code lng}
+	 * 
+	 * @param radius measurement in kms
+	 */
+	public Set<Store> getAllWithinRadius(int radius, double lat, double lng) {
+		return stores.stream()
+			.filter(store -> isWithin(store, radius, lat, lng))
+			.collect(Collectors.toSet());
+	}
+	
+	private boolean isWithin(Store store, int radius, double lat, double lng) {
+		return distance(lat, lng, store.getLat(), store.getLng()) <= radius;
+	}
+
+	private static final int EARTH_RADIUS = 6371; // Approximate Earth's radius in KMs
+
+    private static double distance(double startLat, double startLng,
+                                  double endLat, double endLng) {
+
+        double dLat  = Math.toRadians((endLat - startLat));
+        double dLng = Math.toRadians((endLng - startLng));
+
+        startLat = Math.toRadians(startLat);
+        endLat   = Math.toRadians(endLat);
+
+        double a = haversin(dLat) + Math.cos(startLat) * Math.cos(endLat) * haversin(dLng);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS * c;
+    }
+
+    private static double haversin(double val) {
+        return Math.pow(Math.sin(val / 2), 2);
+    }
 }

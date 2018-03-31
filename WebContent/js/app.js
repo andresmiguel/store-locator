@@ -5,7 +5,7 @@ function init() {
 }
 
 function displayStores() {
-    AJAX.getJSON("api/rest/stores", function(response, status) {
+    AJAX.getJSON("api/rest/stores", {}, function(response, status) {
         if (status === 200) {
             STORES.load(response);
             STORES.displayAllOnMap();
@@ -30,12 +30,19 @@ function onSelectStore() {
     STORES.displayOnMap(selectedStoreId);
 }
 
+function onSearch() {
+    var searchLocation = document.getElementById("search-location").value;
+    var radius = document.getElementById("radius").value;
+    STORES.displayInRadius(radius, searchLocation);
+}
+
 var STORES = (function() {
 
     var _stores = {};
     var _markers = {};
     var _map = null;
     var SEE_ALL_STORES = -1;
+    var _GEOCODER = new google.maps.Geocoder();
 
     var Store = function(id, name, address, lat, lng) {
         this.id = id;
@@ -47,9 +54,11 @@ var STORES = (function() {
 
     var setMap = function(map) {
         _map = map;
-    }
+    };
 
     var load = function(storeArr) {
+        _stores = {};
+        _markers = {};
         if (storeArr) {
             for(var i = 0; i < storeArr.length; i++) {
                 _stores[storeArr[i].id] = new Store(
@@ -64,6 +73,11 @@ var STORES = (function() {
         }
     };
 
+    var reset = function(storeArr) {
+        hideAllMarkers();
+        load(storeArr);
+    };
+
     var displayOnMap = function(storeId) {        
         
         _assertMap();
@@ -74,7 +88,7 @@ var STORES = (function() {
             hideAllMarkers();
             _markers[storeId] && _markers[storeId].setMap(_map);
         }
-    }
+    };
 
     var displayAllOnMap = function() {
 
@@ -89,21 +103,18 @@ var STORES = (function() {
             marker.setMap(_map);
         }
         _map.fitBounds(bounds); 
-    }
+    };
 
     var displayOnSelect = function(select) {
         if (select) {
             var keys = Object.keys(_stores);
+            _clearSelect(select);
             select.options[select.options.length] = new Option("See all stores", SEE_ALL_STORES);
             for (var i = 0; i < keys.length; i++) {
                 select.options[select.options.length] = new Option(_stores[keys[i]].name, _stores[keys[i]].id);
             }
         }
-    }
-
-    var getById = function(id) {
-        return _stores[id];
-    }
+    };
 
     var hideAllMarkers = function() {
         var keys = Object.keys(_markers);
@@ -111,7 +122,28 @@ var STORES = (function() {
         for (var i = 0; i < keys.length; i++) {
             _markers[keys[i]].setMap(null);
         }
-    }
+    };
+
+    var displayInRadius = function(radius, address) {
+        _GEOCODER.geocode({"address": address}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                var lat = results[0].geometry.location.lat();
+                var lng = results[0].geometry.location.lng();
+                var params = {
+                    "radius": radius,
+                    "lat": Number.parseFloat(lat),
+                    "lng": Number.parseFloat(lng)
+                };
+                AJAX.getJSON("api/rest/stores/search/radius", params, function(response, status) {
+                    if (status === 200) {
+                        reset(response);
+                        displayAllOnMap();
+                        displayOnSelect(document.getElementById("stores-sel"));
+                    }
+                });
+            }
+        });
+    };
 
     var _createMarker = function(store) {
         var newMarker = new google.maps.Marker({
@@ -127,17 +159,23 @@ var STORES = (function() {
         });
 
         return newMarker;
-    }
+    };
 
     _createStoreStoreMarkerWindow = function(store) {
         return new google.maps.InfoWindow({
           content: "<b>" + store.name + "</b><br>" + store.address
         });
-    }
+    };
 
     var _assertMap = function() {
         if (_map === null) {
             throw "Map is not set!";
+        }
+    };
+
+    _clearSelect = function(select) {
+        for(var i = select.options.length - 1 ; i >= 0 ; i--) {
+            select.remove(i);
         }
     }
 
@@ -147,7 +185,9 @@ var STORES = (function() {
         load: load,
         displayAllOnMap: displayAllOnMap,
         displayOnSelect: displayOnSelect,
-        displayOnMap: displayOnMap        
+        displayOnMap: displayOnMap,
+        displayInRadius: displayInRadius,
+        reset: reset      
     };
 })();
 
@@ -156,7 +196,7 @@ var AJAX = (function() {
             new ActiveXObject("Microsoft.XMLHTTP") :
             new XMLHttpRequest;
     
-    var getJSON = function(url, callback) {        
+    var getJSON = function(url, params, callback) {        
 
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
@@ -165,8 +205,24 @@ var AJAX = (function() {
             }
         };
 
-        request.open("GET", url, true);
+        request.open("GET", url + buildGetParams(params), true);
         request.send(null);
+    };
+
+    var buildGetParams = function(params) {
+        if (params) {
+            var keys = Object.keys(params);
+            var urlParams = "?";
+            for (var i = 0; i < keys.length; i++) {
+                urlParams += keys[i] + "=" + params[keys[i]];
+                if (i !== keys.length - 1) {
+                    urlParams += "&";
+                }
+            }
+            return urlParams;
+        } else {
+            return "";
+        }
     };
 
     var doNothing = function() {};
