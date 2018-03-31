@@ -18,10 +18,6 @@
 			<div class="col-3">
 				<div id="stores-form">
 					<div class="row form-group">
-						<label for="stores-sel" class="col-12">Stores</label>
-						<select name="stores-sel" id="stores-sel" class="col-12"></select>
-					</div>
-					<div class="row form-group">
 						<label for="search-location" class="col-12">Search Location</label>
 						<input type="text" id="search-location" class="col-12" />
 					</div>
@@ -35,7 +31,15 @@
 				</div>
 			</div>
 			<div class="col-9">
-				<div id="map"></div>
+				<div class="row">
+					<div class="row form-group">
+						<label for="stores-sel" class="col-12">Stores</label>
+						<select name="stores-sel" id="stores-sel" class="col-6"></select>
+					</div>
+				</div>
+				<div class="row">
+					<div id="map"></div>
+				</div>
 			</div>
 		</div>
 	</div>	
