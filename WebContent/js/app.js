@@ -163,6 +163,22 @@ var STORES = (function() {
         _displayOnSelect();
     };
 
+    var _createMarker = function(store) {
+        var newMarker = new google.maps.Marker({
+           position: new google.maps.LatLng(store.lat, store.lng),
+           map: null,
+           title: store.name,
+           animation: google.maps.Animation.DROP
+        });
+
+        newMarker.addListener('click', function() {
+            var infowindow = _createStoreStoreMarkerWindow(store);
+            infowindow.open(_map, newMarker);
+        });
+
+        return newMarker;
+    };
+
     var _displayOnMap = function(storeId) {
         
         _assertMap();
@@ -234,6 +250,62 @@ var STORES = (function() {
         }
     };
 
+    var _doRadiusRequest = function(radius, lat, lng) {
+        var params = {
+            "radius": radius,
+            "lat": Number.parseFloat(lat),
+            "lng": Number.parseFloat(lng)
+        };
+        AJAX.getJSON("api/rest/stores/search/radius", params, function(response, status) {
+            if (status === 200) {
+                _searchedLocation = true;
+                loadAndDisplay(response);
+                _displayUserMaker(lat, lng);
+                _calculateDistances();
+            }
+        });
+    };
+
+    var _calculateDistances = function() {
+        var place = _autoComplete.getPlace();
+        var origin = new google.maps.LatLng(
+            place.geometry.location.lat(),
+            place.geometry.location.lng()
+        );
+        var destinations = [];
+        var keys = Object.keys(_stores);
+
+        for (var i = 0; i < keys.length; i++) {
+            destinations.push(_stores[keys[i]].address);
+        }
+
+        _DISTANCE_SERVICE.getDistanceMatrix({
+            origins: [origin],
+            destinations: destinations,
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: unitSys = google.maps.UnitSystem.METRIC
+        }, _displayDistances);
+    };
+
+    var _displayDistances = function(response, status) {
+        if (status === google.maps.DistanceMatrixStatus.OK) {
+            var keys = Object.keys(_stores);
+            var origin = response.originAddresses[0];
+            var toDisplay = "From Search Location (" + origin + ") to: <ul>";
+            var elements = response.rows[0].elements;
+
+            for (var i = 0; i < elements.length; i++) {                    
+                toDisplay += "<li><b>" +  _stores[keys[i]].name + "</b>: ";
+                if (elements[i].status === "OK") {                    
+                    toDisplay += "<b>" + elements[i].distance.text + "</b> in <b>" 
+                    + elements[i].duration.text + "</b></li>";
+                }
+            }
+            toDisplay += "</ul>"
+            _distancesPanel.innerHTML = toDisplay;
+        }
+    }
+
     var display = function(storeId) {
         if (storeId && storeId != SEE_ALL_STORES) {
             if (_searchedLocation) {
@@ -267,38 +339,6 @@ var STORES = (function() {
                _DIRECTIONS_RENDERER.setPanel(_directionsPanel);
             }
         });
-    };
-
-    var _doRadiusRequest = function(radius, lat, lng) {
-        var params = {
-            "radius": radius,
-            "lat": Number.parseFloat(lat),
-            "lng": Number.parseFloat(lng)
-        };
-        AJAX.getJSON("api/rest/stores/search/radius", params, function(response, status) {
-            if (status === 200) {
-                _searchedLocation = true;
-                loadAndDisplay(response);
-                _displayUserMaker(lat, lng);
-                _calculateDistances();
-            }
-        });
-    };
-
-    var _createMarker = function(store) {
-        var newMarker = new google.maps.Marker({
-           position: new google.maps.LatLng(store.lat, store.lng),
-           map: null,
-           title: store.name,
-           animation: google.maps.Animation.DROP
-        });
-
-        newMarker.addListener('click', function() {
-            var infowindow = _createStoreStoreMarkerWindow(store);
-            infowindow.open(_map, newMarker);
-        });
-
-        return newMarker;
     };
 
     var _createStoreStoreMarkerWindow = function(store) {
@@ -345,46 +385,6 @@ var STORES = (function() {
         }
         _userMarker.setPosition(new google.maps.LatLng(lat, lng));
     };
-
-    var _calculateDistances = function() {
-        var place = _autoComplete.getPlace();
-        var origin = new google.maps.LatLng(
-            place.geometry.location.lat(),
-            place.geometry.location.lng()
-        );
-        var destinations = [];
-        var keys = Object.keys(_stores);
-
-        for (var i = 0; i < keys.length; i++) {
-            destinations.push(_stores[keys[i]].address);
-        }
-
-        _DISTANCE_SERVICE.getDistanceMatrix({
-            origins: [origin],
-            destinations: destinations,
-            travelMode: google.maps.TravelMode.DRIVING,
-            unitSystem: unitSys = google.maps.UnitSystem.METRIC
-        }, _displayDistances);
-    };
-
-    var _displayDistances = function(response, status) {
-        if (status === google.maps.DistanceMatrixStatus.OK) {
-            var keys = Object.keys(_stores);
-            var origin = response.originAddresses[0];
-            var toDisplay = "From Search Location (" + origin + ") to: <ul>";
-            var elements = response.rows[0].elements;
-
-            for (var i = 0; i < elements.length; i++) {                    
-                toDisplay += "<li><b>" +  _stores[keys[i]].name + "</b>: ";
-                if (elements[i].status === "OK") {                    
-                    toDisplay += "<b>" + elements[i].distance.text + "</b> in <b>" 
-                    + elements[i].duration.text + "</b></li>";
-                }
-            }
-            toDisplay += "</ul>"
-            _distancesPanel.innerHTML = toDisplay;
-        }
-    }
 
     return {
         Store: Store,
