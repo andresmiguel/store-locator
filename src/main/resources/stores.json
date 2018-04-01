@@ -1,72 +1,142 @@
 [
-  {
-    "id": 1,
-    "name": "Heir Apparel",
-    "address": "Crowea Pl, Frenchs Forest NSW 2086",
-    "lat": -33.737885,
-    "lng": 151.23526
-  },
-  {
-    "id": 2,
-    "name": "BeeYourself Clothing",
-    "address": "Thalia St, Hassall Grove NSW 2761",
-    "lat": -33.729752,
-    "lng": 150.83609
-  },
-  {
-    "id": 3,
-    "name": "Dress Code",
-    "address": "Glenview Avenue, Revesby, NSW 2212",
-    "lat": -33.949448,
-    "lng": 151.008591
-  },
-  {
-    "id": 4,
-    "name": "The Legacy",
-    "address": "Charlotte Ln, Chatswood NSW 2067",
-    "lat": -33.796669,
-    "lng": 151.183609
-  },
-  {
-    "id": 5,
-    "name": "Fashiontasia",
-    "address": "Braidwood Dr, Prestons NSW 2170",
-    "lat": -33.944489,
-    "lng": 150.854706
-  },
-  {
-    "id": 6,
-    "name": "Trish & Tash",
-    "address": "Lincoln St, Lane Cove West NSW 2066",
-    "lat": -33.812222,
-    "lng": 151.143707
-  },
-  {
-    "id": 7,
-    "name": "Perfect Fit",
-    "address": "Darley Rd, Randwick NSW 2031",
-    "lat": -33.903557,
-    "lng": 151.237732
-  },
-  {
-    "id": 8,
-    "name": "Buena Ropa!",
-    "address": "Brodie St, Rydalmere NSW 2116",
-    "lat": -33.815521,
-    "lng": 151.026642
-  },
-  {
-    "id": 9,
-    "name": "Coxcomb and Lily Boutique",
-    "address": "Ferrers Rd, Horsley Park NSW 2175",
-    "lat": -33.829525,
-    "lng": 150.873764
-  },
-  {
-    "id": 10,
-    "name": "Moda Couture",
-    "address": "Northcote Rd, Glebe NSW 2037",
-    "lat": -33.873882,
-    "lng": 151.17746
-  }
+	{
+		"id": 1,
+		"name": "Kmart",
+		"address": "3825 NW 7th St, Miami, FL 33126, USA",
+		"lat": 25.7799778,
+		"lng": -80.25879049999998
+	},
+	{
+		"id": 2,
+		"name": "West elm",
+		"address": "3201 N Miami Ave #108, Miami, FL 33127, USA",
+		"lat": 25.8079238,
+		"lng": -80.19452079999996
+	},
+	{
+		"id": 3,
+		"name": "Disney Store",
+		"address": "401 Biscayne Blvd, Miami, FL 33132, USA",
+		"lat": 25.7792199,
+		"lng": -80.18654750000002
+	},
+	{
+		"id": 4,
+		"name": "Touch Dolls Boutique",
+		"address": "7231 Biscayne Blvd, Miami, FL 33138, USA",
+		"lat": 25.841529,
+		"lng": -80.18419500000005
+	},
+	{
+		"id": 5,
+		"name": "Nike Miami",
+		"address": "1035 Lincoln Rd, Miami Beach, FL 33139, USA",
+		"lat": 25.7908426,
+		"lng": -80.1394565
+	},
+	{
+		"id": 6,
+		"name": "Party City",
+		"address": "3727 NW 7th St, Miami, FL 33126, USA",
+		"lat": 25.7807885,
+		"lng": -80.25875529999996
+	},
+	{
+		"id": 7,
+		"name": "Big Box Furniture Company",
+		"address": "3501 NW 33rd St, Miami, FL 33142, USA",
+		"lat": 25.8062882,
+		"lng": -80.25295019999999
+	},
+	{
+		"id": 8,
+		"name": "Whole Foods Market",
+		"address": "299 SE 3rd Ave, Miami, FL 33131, USA",
+		"lat": 25.7719727,
+		"lng": -80.18907179999997
+	},
+	{
+		"id": 9,
+		"name": "West Marine",
+		"address": "3635 S Dixie Hwy, Miami, FL 33133, USA",
+		"lat": 25.7340483,
+		"lng": -80.25282340000001
+	},
+	{
+		"id": 10,
+		"name": "Louis Vuitton Miami Design Distric",
+		"address": "140 NE 39th St, Miami, FL 33137, USA",
+		"lat": 25.8126055,
+		"lng": -80.19243719999997
+	},
+	{
+		"id": 11,
+		"name": "GameStop",
+		"address": "271 SW 8th St, Miami, FL 33130, USA",
+		"lat": 25.7666181,
+		"lng": -80.19876729999999
+	},
+	{
+		"id": 12,
+		"name": "Bayside Time",
+		"address": "401 Biscayne Blvd, Miami, FL 33132, USA",
+		"lat": 25.7792199,
+		"lng": -80.18654750000002
+	},
+	{
+		"id": 13,
+		"name": "Westland Mall",
+		"address": "1675 W 49th St, Hialeah, FL 33012, USA",
+		"lat": 25.8680037,
+		"lng": -80.31893389999999
+	},
+	{
+		"id": 14,
+		"name": "SKECHERS Factory Outlet",
+		"address": "3301 W Okeechobee Rd, Hialeah, FL 33012, USA",
+		"lat": 25.8527688,
+		"lng": -80.31882989999997
+	},
+	{
+		"id": 15,
+		"name": "Best Buy",
+		"address": "4001 W 20th Ave, Hialeah, FL 33012, USA",
+		"lat": 25.8584073,
+		"lng": -80.32163209999999
+	},
+	{
+		"id": 16,
+		"name": "Walmart Supercenter",
+		"address": "9300 NW 77th Ave, Miami Lakes, FL 33016, USA",
+		"lat": 25.8600631,
+		"lng": -80.32370730000002
+	},
+	{
+		"id": 17,
+		"name": "Dollar Tree",
+		"address": "596 W 49th St, Hialeah, FL 33012, USA",
+		"lat": 25.8654332,
+		"lng": -80.29464689999998
+	},
+	{
+		"id": 18,
+		"name": "Frames USA",
+		"address": "6822 SW 40th St, Miami, FL 33155, USA",
+		"lat": 25.7327199,
+		"lng": -80.30490050000003
+	},
+	{
+		"id": 19,
+		"name": "USA Jewelry",
+		"address": "7381 SW 8th St, Miami, FL 33144, USA",
+		"lat": 25.7629639,
+		"lng": -80.31523920000001
+	},
+	{
+		"id": 20,
+		"name": "Motoport USA",
+		"address": "3312, 1200 NW 57th Ave, Miami, FL 33126, USA",
+		"lat": 25.7830014,
+		"lng": -80.28883730000001
+	}
 ]
