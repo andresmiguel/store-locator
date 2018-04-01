@@ -3,7 +3,7 @@
 }
 
 html {
-  font-family: "Verdana Sans", sans-serif !important; 
+  font-family: Roboto, sans-serif; 
 }
 
 .row::after {
@@ -134,3 +134,22 @@ button:active {
               0 3px 14px 2px rgba(0, 0, 0, 0.12),
               0 5px 5px -3px rgba(0, 0, 0, 0.4);
 }
+
+div#distances {
+  font-family: Roboto, sans-serif;
+  font-weight: 300;
+  font-size: 90%;
+  color: #2C2C2C;
+}
+
+div#distancesForm {
+  margin-left: 10px;
+}
+
+div#distancesForm b {
+  font-weight: 400;  
+}
+
+div#distancesForm li {
+  margin-bottom: 5px;
+} 
