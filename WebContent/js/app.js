@@ -126,9 +126,13 @@ var STORES = (function() {
         if (_storeSelect) {
             var keys = Object.keys(_stores);
             _clearSelect(_storeSelect);
-            _storeSelect.options[_storeSelect.options.length] = new Option("See all stores", SEE_ALL_STORES);
-            for (var i = 0; i < keys.length; i++) {
-                _storeSelect.options[_storeSelect.options.length] = new Option(_stores[keys[i]].name, _stores[keys[i]].id);
+            if (keys.length == 0) {
+                _storeSelect.options[0] = new Option("No stores to display", -2);
+            } else {
+                _storeSelect.options[_storeSelect.options.length] = new Option("See all stores", SEE_ALL_STORES);
+                for (var i = 0; i < keys.length; i++) {
+                    _storeSelect.options[_storeSelect.options.length] = new Option(_stores[keys[i]].name, _stores[keys[i]].id);
+                }
             }
         }
     };
