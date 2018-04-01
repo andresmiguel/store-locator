@@ -12,8 +12,7 @@ function init() {
 function displayStores() {
     AJAX.getJSON("api/rest/stores", {}, function(response, status) {
         if (status === 200) {
-            STORES.load(response);
-            STORES.display();
+            STORES.loadAndDisplay(response);
         }
     });
 }
@@ -31,13 +30,13 @@ google.maps.event.addDomListener(window, "load", init);
 function onSelectStore() {
     var selElem = document.getElementById("stores-sel");
     var selectedStoreId = selElem.options[selElem.selectedIndex].value;
-    STORES.displayDirections(selectedStoreId);
+    STORES.display(selectedStoreId);
 }
 
 function onSearch() {
     var searchLocation = document.getElementById("search-location").value;
     var radius = document.getElementById("radius").value;
-    STORES.displayInRadius(radius, searchLocation);
+    STORES.loadAndDisplayInRadius(radius, searchLocation);
 }
 
 var STORES = (function() {
@@ -72,9 +71,10 @@ var STORES = (function() {
         _createAutocomplete(_map, _searchInput);
         _createUserMarkerIcon();
         _directionsPanel = configObj["directions"];
-    }
+    };
 
-    var load = function(storeArr) {
+    var loadAndDisplay = function(storeArr) {
+        _hideAllMarkers();
         _stores = {};
         _markers = {};
         if (storeArr) {
@@ -89,28 +89,20 @@ var STORES = (function() {
                 _markers[storeArr[i].id] = _createMarker(storeArr[i]);
             }
         }
-    };
-
-    var reset = function(storeArr) {
-        hideAllMarkers();
-        load(storeArr);
-    };
-
-    var display = function() {
         _DIRECTIONS_RENDERER.setMap(null);
         _DIRECTIONS_RENDERER.setPanel(null);
         _displayAllOnMap();
         _displayOnSelect();
-    }
+    };
 
-    var displayOnMap = function(storeId) {        
+    var _displayOnMap = function(storeId) {        
         
         _assertMap();
 
         if (storeId && storeId == SEE_ALL_STORES) {
             _displayAllOnMap();
         } else if (storeId) {
-            hideAllMarkers();
+            _hideAllMarkers();
             _markers[storeId] && _markers[storeId].setMap(_map);
         }
     };
@@ -145,7 +137,7 @@ var STORES = (function() {
         }
     };
 
-    var hideAllMarkers = function() {
+    var _hideAllMarkers = function() {
         var keys = Object.keys(_markers);
 
         for (var i = 0; i < keys.length; i++) {
@@ -153,7 +145,7 @@ var STORES = (function() {
         }
     };
 
-    var displayInRadius = function(radius, address) {
+    var loadAndDisplayInRadius = function(radius, address) {
         var place = _autoComplete.getPlace();
         if (place) {
             _doRadiusRequest(
@@ -174,33 +166,39 @@ var STORES = (function() {
         }
     };
 
-    var displayDirections = function(storeId) {
+    var display = function(storeId) {
         if (storeId && storeId != SEE_ALL_STORES) {
             if (_searchedLocation) {
-                hideAllMarkers();
-                _userMarker.setMap(null);
-                var request = {
-                    origin: _searchInput.value,
-                    destination: _stores[storeId].address,
-                    travelMode: google.maps.DirectionsTravelMode.DRIVING,
-                    unitSystem: google.maps.UnitSystem.METRIC
-                };
-                _DIRECTIONS_SERVICE.route(request, function(response, status) {
-                    if (status == google.maps.DirectionsStatus.OK) {
-                       _DIRECTIONS_RENDERER.setDirections(response);
-                       _DIRECTIONS_RENDERER.setMap(_map);
-                       _DIRECTIONS_RENDERER.setPanel(_directionsPanel);
-                    }
-                });
+                _displayDirections(storeId);
             } else {
-                displayOnMap(storeId);
+                _displayOnMap(storeId);
             }
         } else if (storeId && storeId == SEE_ALL_STORES) {
-            display();
+            _DIRECTIONS_RENDERER.setMap(null);
+            _DIRECTIONS_RENDERER.setPanel(null);
+            _displayAllOnMap();
             if (_searchedLocation) {
                 _userMarker.setMap(_map);
             }
         }            
+    };
+
+    var _displayDirections = function(storeId) {
+        _hideAllMarkers();
+        _userMarker.setMap(null);
+        var request = {
+            origin: _searchInput.value,
+            destination: _stores[storeId].address,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        };
+        _DIRECTIONS_SERVICE.route(request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+               _DIRECTIONS_RENDERER.setDirections(response);
+               _DIRECTIONS_RENDERER.setMap(_map);
+               _DIRECTIONS_RENDERER.setPanel(_directionsPanel);
+            }
+        });
     };
 
     var _doRadiusRequest = function(radius, lat, lng) {
@@ -212,12 +210,11 @@ var STORES = (function() {
         AJAX.getJSON("api/rest/stores/search/radius", params, function(response, status) {
             if (status === 200) {
                 _searchedLocation = true;
-                reset(response);
-                display();
+                loadAndDisplay(response);
                 _displayUserMaker(lat, lng);
             }
         });
-    }
+    };
 
     var _createMarker = function(store) {
         var newMarker = new google.maps.Marker({
@@ -283,12 +280,9 @@ var STORES = (function() {
     return {
         Store: Store,
         config: config,
-        load: load,
-        display: display,
-        displayOnMap: displayOnMap,
-        displayInRadius: displayInRadius,
-        reset: reset,
-        displayDirections: displayDirections    
+        loadAndDisplay: loadAndDisplay,
+        loadAndDisplayInRadius: loadAndDisplayInRadius,
+        display: display    
     };
 })();
 
