@@ -3,7 +3,8 @@ function init() {
     STORES.config({
         "map": createMap(),
         "store-select": document.getElementById("stores-sel"),
-        "search-input": document.getElementById("search-location")
+        "search-input": document.getElementById("search-location"),
+        "directions": document.getElementById("directions")
     });
     displayStores();
 }
@@ -30,7 +31,7 @@ google.maps.event.addDomListener(window, "load", init);
 function onSelectStore() {
     var selElem = document.getElementById("stores-sel");
     var selectedStoreId = selElem.options[selElem.selectedIndex].value;
-    STORES.displayOnMap(selectedStoreId);
+    STORES.displayDirections(selectedStoreId);
 }
 
 function onSearch() {
@@ -48,9 +49,13 @@ var STORES = (function() {
     var _map = null;
     var SEE_ALL_STORES = -1;
     var _GEOCODER = new google.maps.Geocoder();
+    var _DIRECTIONS_SERVICE = new google.maps.DirectionsService();
+    var _DIRECTIONS_RENDERER = new google.maps.DirectionsRenderer();
     var _storeSelect;
     var _searchInput;
     var _autoComplete;
+    var _directionsPanel;
+    var _searchedLocation = false;
 
     var Store = function(id, name, address, lat, lng) {
         this.id = id;
@@ -66,6 +71,7 @@ var STORES = (function() {
         _searchInput = configObj["search-input"];
         _createAutocomplete(_map, _searchInput);
         _createUserMarkerIcon();
+        _directionsPanel = configObj["directions"];
     }
 
     var load = function(storeArr) {
@@ -91,6 +97,8 @@ var STORES = (function() {
     };
 
     var display = function() {
+        _DIRECTIONS_RENDERER.setMap(null);
+        _DIRECTIONS_RENDERER.setPanel(null);
         _displayAllOnMap();
         _displayOnSelect();
     }
@@ -166,6 +174,35 @@ var STORES = (function() {
         }
     };
 
+    var displayDirections = function(storeId) {
+        if (storeId && storeId != SEE_ALL_STORES) {
+            if (_searchedLocation) {
+                hideAllMarkers();
+                _userMarker.setMap(null);
+                var request = {
+                    origin: _searchInput.value,
+                    destination: _stores[storeId].address,
+                    travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC
+                };
+                _DIRECTIONS_SERVICE.route(request, function(response, status) {
+                    if (status == google.maps.DirectionsStatus.OK) {
+                       _DIRECTIONS_RENDERER.setDirections(response);
+                       _DIRECTIONS_RENDERER.setMap(_map);
+                       _DIRECTIONS_RENDERER.setPanel(_directionsPanel);
+                    }
+                });
+            } else {
+                displayOnMap(storeId);
+            }
+        } else if (storeId && storeId == SEE_ALL_STORES) {
+            display();
+            if (_searchedLocation) {
+                _userMarker.setMap(_map);
+            }
+        }            
+    };
+
     var _doRadiusRequest = function(radius, lat, lng) {
         var params = {
             "radius": radius,
@@ -174,6 +211,7 @@ var STORES = (function() {
         };
         AJAX.getJSON("api/rest/stores/search/radius", params, function(response, status) {
             if (status === 200) {
+                _searchedLocation = true;
                 reset(response);
                 display();
                 _displayUserMaker(lat, lng);
@@ -226,7 +264,7 @@ var STORES = (function() {
             new google.maps.Size(21, 34),
             new google.maps.Point(0, 0),
             new google.maps.Point(10, 34));
-    }
+    };
 
     var _displayUserMaker = function(lat, lng) {
         _assertMap();
@@ -240,7 +278,7 @@ var STORES = (function() {
             });
         }
         _userMarker.setPosition(new google.maps.LatLng(lat, lng));
-    }
+    };
 
     return {
         Store: Store,
@@ -249,7 +287,8 @@ var STORES = (function() {
         display: display,
         displayOnMap: displayOnMap,
         displayInRadius: displayInRadius,
-        reset: reset      
+        reset: reset,
+        displayDirections: displayDirections    
     };
 })();
 
